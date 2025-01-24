@@ -73,3 +73,77 @@ module.exports.deletePost = async (req, res) => {
     return res.status(400).send(err);
   }
 };
+
+module.exports.likePost = async (req, res) => {
+  try {
+    if (!ObjectID.isValid(req.params.id)) {
+      return res.status(400).send("ID inconnu : " + req.params.id);
+    }
+
+    const likers = await PostModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        $addToSet: { likers: req.body.id },
+      },
+      { new: true }
+    );
+
+    if (!likers) {
+      return res.status(404).send("Aucun likers trouvé avec cet ID.");
+    }
+
+    const likes = await UserModel.findByIdAndUpdate(
+      req.body.id,
+      {
+        $addToSet: { likes: req.params.id },
+      },
+      { new: true }
+    );
+
+    if (!likes) {
+      return res.status(404).send("Aucun likes trouvé avec cet ID.");
+    }
+
+    res.send(likes);
+  } catch (err) {
+    console.error("Erreur :", err);
+    return res.status(400).send(err);
+  }
+};
+
+module.exports.unlikePost = async (req, res) => {
+  try {
+    if (!ObjectID.isValid(req.params.id)) {
+      return res.status(400).send("ID inconnu : " + req.params.id);
+    }
+
+    const likers = await PostModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        $pull: { likers: req.body.id },
+      },
+      { new: true }
+    );
+
+    if (!likers) {
+      return res.status(404).send("Aucun likers trouvé avec cet ID.");
+    }
+
+    const likes = await UserModel.findByIdAndUpdate(
+      req.body.id,
+      {
+        $pull: { likes: req.params.id },
+      },
+      { new: true }
+    );
+
+    if (!likes) {
+      return res.status(404).send("Aucun likes trouvé avec cet ID.");
+    }
+
+    res.send(likes);
+  } catch (err) {
+    console.error("Erreur :", err);
+    return res.status(400).send(err);
+  }
+};

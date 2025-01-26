@@ -33,3 +33,23 @@ module.exports.signInErrors = (err) => {
 
   return errors;
 };
+
+module.exports.uploadErrors = (err) => {
+  let errors = {};
+
+  if (err.message.includes("invalid file")) {
+    errors.format =
+      "Unsupported file format. Allowed formats are JPG, PNG, and JPEG.";
+  }
+
+  if (err.message.includes("max size")) {
+    errors.size = "File size exceeds the maximum limit of 500 KB.";
+  }
+
+  // Si aucune erreur spécifique n'est trouvée
+  if (Object.keys(errors).length === 0) {
+    errors.general = "An unexpected error occurred.";
+  }
+
+  return errors;
+};

@@ -12,9 +12,14 @@ module.exports.readPost = async (req, res) => {
 };
 
 module.exports.createPost = async (req, res) => {
+  if (!req.file) {
+    throw new Error("No file provided");
+  }
+
   const newPost = new PostModel({
     posterId: req.body.posterId,
     message: req.body.message,
+    picture: req.file != null ? "uploads/post/" + req.file.filename : "",
     video: req.body.video,
     likers: [],
     comments: [],
